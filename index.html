@@ -1,18 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" >
-<head>
-  <meta charset="UTF-8">
-  <title>Untitled</title>
-  <link rel="stylesheet" href="./style.css">
-
-</head>
-<body>
-<!-- partial:index.partial.html -->
-<!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Productaantallen met Numpad</title>
   <style>
     body {
@@ -65,18 +55,18 @@
     .numpad {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      max-width: 300px;
+      gap: 8px;
+      max-width: 240px;
       margin: 20px auto;
     }
 
     .numpad button {
-      padding: 20px;
-      font-size: 1.5em;
+      padding: 10px;
+      font-size: 1.2em;
       background-color: #fff;
       border: 1px solid #ccc;
       border-radius: 5px;
-      box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+      box-shadow: 1px 1px 2px rgba(0,0,0,0.1);
       cursor: pointer;
     }
 
@@ -114,7 +104,6 @@
     <label for="productC">Aantal Product C:</label>
     <input type="number" id="productC" name="productC" required>
 
-    <!-- NUMPAD invoer -->
     <label for="display">Aantal (via numpad):</label>
     <input type="text" id="display" readonly>
 
@@ -131,10 +120,11 @@
       <button type="button" onclick="clearDisplay()">C</button>
       <button type="button" onclick="press('0')">0</button>
       <button type="button" onclick="backspace()">←</button>
-      <button type="button" onclick="confirmNumpad()" style="grid-column: span 3;">Enter</button>
+      <button type="button" onclick="confirmNumpad()">Enter</button>
+      <button type="button" onclick="incrementDisplay()">+</button>
+      <button type="button" onclick="decrementDisplay()">−</button>
     </div>
 
-    <!-- Invoerveld onder numpad -->
     <label for="opmerkingOnder">Opmerking:</label>
     <input type="text" id="opmerkingOnder" name="opmerkingOnder">
 
@@ -142,31 +132,61 @@
   </form>
 
   <script>
+    let originalValue = null;
+
     function press(num) {
       document.getElementById("display").value += num;
     }
 
     function clearDisplay() {
       document.getElementById("display").value = '';
+      originalValue = null;
     }
 
     function backspace() {
-      let display = document.getElementById("display");
+      const display = document.getElementById("display");
       display.value = display.value.slice(0, -1);
     }
 
     function confirmNumpad() {
       const display = document.getElementById("display");
-      const value = display.value.trim();
-      if (value) {
-        console.log("Numpad invoer bevestigd:", value);
+      const value = parseInt(display.value.trim());
+      if (!isNaN(value)) {
         document.getElementById("productA").value = value;
-        // Display wordt niet gewist zodat waarde zichtbaar blijft
       }
       document.getElementById("opmerkingOnder").focus();
     }
 
-    // Enter op display input
+    function getOriginalValue() {
+      const current = parseInt(document.getElementById("display").value.trim());
+      if (!isNaN(current)) {
+        if (originalValue === null) {
+          originalValue = current;
+        }
+        return originalValue;
+      }
+      return null;
+    }
+
+    function incrementDisplay() {
+      const display = document.getElementById("display");
+      const current = parseInt(display.value.trim());
+      const base = getOriginalValue();
+      if (!isNaN(current) && base !== null) {
+        display.value = current + base;
+      }
+    }
+
+    function decrementDisplay() {
+      const display = document.getElementById("display");
+      const current = parseInt(display.value.trim());
+      const base = getOriginalValue();
+      if (!isNaN(current) && base !== null) {
+        const result = current - base;
+        display.value = result >= 0 ? result : 0;
+      }
+    }
+
     document.getElementById("display").addEventListener("keydown", function(e) {
       if (e.key === "Enter") {
         e.preventDefault();
@@ -174,7 +194,6 @@
       }
     });
 
-    // Enter-navigatie voor eerste 3 velden
     const fields = ["productA", "productB", "productC"];
     fields.forEach((id, index) => {
       const input = document.getElementById(id);
@@ -184,23 +203,17 @@
           if (index < fields.length - 1) {
             document.getElementById(fields[index + 1]).focus();
           } else {
-            document.getElementById("display").focus(); // na laatste veld: naar numpad
+            document.getElementById("display").focus();
           }
         }
       });
     });
 
-    // Simuleer formulierverzending
     document.getElementById("productForm").addEventListener("submit", function(e) {
       e.preventDefault();
       alert("Formulier verzonden!");
     });
   </script>
-
-</body>
-</html>
-<!-- partial -->
-  <script  src="./script.js"></script>
 
 </body>
 </html>
